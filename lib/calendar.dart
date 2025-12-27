@@ -85,10 +85,12 @@ class QuotationText extends StatelessWidget {
 }
 
 class HasEventIcon extends StatelessWidget {
+  final bool isOfMonth;
   final Future<DateEvent?> solarDateEvent;
   final Future<DateEvent?> lunarDateEvent;
 
   const HasEventIcon({
+    required this.isOfMonth,
     required this.solarDateEvent,
     required this.lunarDateEvent,
     super.key,
@@ -106,13 +108,16 @@ class HasEventIcon extends StatelessWidget {
         if (!hasEvent) {
           return const SizedBox.shrink();
         }
-        return const Positioned(
+
+        return Positioned(
           top: 1,
           right: 1,
           child: Text(
             "*",
             style: TextStyle(
-              color: Color.fromARGB(255, 230, 0, 0),
+              color: isOfMonth
+                  ? const Color.fromARGB(255, 179, 179, 179)
+                  : const Color.fromARGB(255, 230, 0, 0),
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -367,7 +372,11 @@ class _CalendarState extends State<Calendar> {
                                     ],
                                   ),
                                   buildAuspiciousDay(item),
-                                  HasEventIcon(solarDateEvent: item.solarDateEvent, lunarDateEvent: item.lunarDateEvent,)
+                                  HasEventIcon(
+                                    isOfMonth: item.solarDate.month != month,
+                                    solarDateEvent: item.solarDateEvent,
+                                    lunarDateEvent: item.lunarDateEvent,
+                                  ),
                                 ],
                               ),
                             ),
