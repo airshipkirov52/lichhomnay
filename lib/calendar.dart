@@ -69,7 +69,7 @@ class QuotationText extends StatelessWidget {
               Text(
                 snapshot.data!.content,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 10,),
+                style: TextStyle(fontSize: 10),
               ),
               Text(
                 snapshot.data!.author,
@@ -77,6 +77,44 @@ class QuotationText extends StatelessWidget {
                 style: TextStyle(fontSize: 10, fontStyle: FontStyle.italic),
               ),
             ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class HasEventIcon extends StatelessWidget {
+  final Future<DateEvent?> solarDateEvent;
+  final Future<DateEvent?> lunarDateEvent;
+
+  const HasEventIcon({
+    required this.solarDateEvent,
+    required this.lunarDateEvent,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<DateEvent?>>(
+      future: Future.wait([solarDateEvent, lunarDateEvent]),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const SizedBox.shrink();
+        }
+        final hasEvent = snapshot.data!.any((e) => e != null);
+        if (!hasEvent) {
+          return const SizedBox.shrink();
+        }
+        return const Positioned(
+          top: 1,
+          right: 1,
+          child: Text(
+            "*",
+            style: TextStyle(
+              color: Color.fromARGB(255, 230, 0, 0),
+              fontWeight: FontWeight.bold,
+            ),
           ),
         );
       },
@@ -329,6 +367,7 @@ class _CalendarState extends State<Calendar> {
                                     ],
                                   ),
                                   buildAuspiciousDay(item),
+                                  HasEventIcon(solarDateEvent: item.solarDateEvent, lunarDateEvent: item.lunarDateEvent,)
                                 ],
                               ),
                             ),
