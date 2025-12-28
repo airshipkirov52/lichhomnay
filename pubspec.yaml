@@ -36,6 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   google_fonts: ^6.3.3
   http: ^1.2.0
+  shared_preferences: ^2.2.2
   rename: ^3.1.0
 
 dev_dependencies:
@@ -54,7 +55,10 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
+  assets:
+    - assets/solardate-events.json
+    - assets/lunardate-events.json
+    - assets/quotations.json
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:lich_hom_nay/calendar_utils.dart';
-import 'package:lich_hom_nay/request_events.dart';
 
 class Calendar extends StatefulWidget {
   const Calendar({super.key});
@@ -27,20 +26,15 @@ class EventText extends StatelessWidget {
           return const SizedBox(height: 0);
         }
         return Container(
-          margin: EdgeInsets.all(5),
-          padding: EdgeInsets.all(3),
-          child: Column(
-            children: [
-              Text(
-                snapshot.data!.events[0].name,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.w900,
-                  fontSize: 13,
-                  color: Color.fromARGB(255, 230, 0, 0),
-                ),
-              ),
-            ],
+          margin: EdgeInsets.only(top: 3),
+          child: Text(
+            snapshot.data!.events[0].name,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.w900,
+              fontSize: 12,
+              color: Color.fromARGB(255, 230, 0, 0),
+            ),
           ),
         );
       },
@@ -62,8 +56,7 @@ class QuotationText extends StatelessWidget {
           return const SizedBox(height: 16);
         }
         return Container(
-          margin: EdgeInsets.all(5),
-          padding: EdgeInsets.all(5),
+          margin: EdgeInsets.only(top: 3),
           child: Column(
             children: [
               Text(
@@ -540,12 +533,15 @@ class _CalendarState extends State<Calendar> {
                         ),
                       ],
                     ),
-                    Column(
-                      children: [
-                        EventText(dateEvent: selectedDate.solarDateEvent),
-                        EventText(dateEvent: selectedDate.lunarDateEvent),
-                        QuotationText(quotation: selectedDate.quotation),
-                      ],
+                    Container(
+                      margin: EdgeInsets.only(top: 8),
+                      child: Column(
+                        children: [
+                          EventText(dateEvent: selectedDate.solarDateEvent),
+                          EventText(dateEvent: selectedDate.lunarDateEvent),
+                          QuotationText(quotation: selectedDate.quotation),
+                        ],
+                      ),
                     ),
                   ],
                 ),

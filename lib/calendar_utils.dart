@@ -1,6 +1,47 @@
 import 'package:lich_hom_nay/constants.dart';
+import 'package:lich_hom_nay/json_cache_service.dart';
 import 'package:lich_hom_nay/lunar_utils.dart';
-import 'package:lich_hom_nay/request_events.dart';
+
+class Event {
+  final String name;
+  final String description;
+  Event({required this.name, required this.description});
+
+  factory Event.fromJson(Map<String, dynamic> json) {
+    return Event(name: json["name"], description: json["description"]);
+  }
+}
+
+class DateEvent {
+  final int date;
+  final int month;
+  final List<Event> events;
+  final bool asterisk;
+  DateEvent({
+    required this.date,
+    required this.month,
+    required this.events,
+    required this.asterisk,
+  });
+  factory DateEvent.fromJson(Map<String, dynamic> json) {
+    return DateEvent(
+      date: json["date"],
+      month: json["month"],
+      events: (json['events'] as List).map((e) => Event.fromJson(e)).toList(),
+      asterisk: json["asterisk"],
+    );
+  }
+}
+
+class Quotation {
+  final String content;
+  final String author;
+  Quotation({required this.content, required this.author});
+
+  factory Quotation.fromJson(Map<String, dynamic> json) {
+    return Quotation(content: json["content"], author: json["author"]);
+  }
+}
 
 class LunarDate {
   final int ldd;
@@ -97,14 +138,11 @@ class SolarLunarDate {
   }
 
   Future<DateEvent?> get solarDateEvent async {
-    final response = await fetchEvents(
-      "https://airshipkirov52.github.io/lichhomnay-events/api/solardate-events.json",
+    final events = await JsonCacheService.fetchEvents(
+      JsonCacheService.solarEventsKey,
     );
-    if (response.isEmpty) {
-      throw Exception("No event data");
-    }
     DateEvent? event;
-    for (final e in response) {
+    for (final e in events) {
       if (e.date == solarDate.day && e.month == solarDate.month) {
         event = e;
         break;
@@ -114,15 +152,11 @@ class SolarLunarDate {
   }
 
   Future<DateEvent?> get lunarDateEvent async {
-    final response = await fetchEvents(
-      "https://airshipkirov52.github.io/lichhomnay-events/api/lunardate-events.json",
+    final events = await JsonCacheService.fetchEvents(
+      JsonCacheService.lunarEventsKey,
     );
-    if (response.isEmpty) {
-      throw Exception("No quotation data");
-    }
-    
     DateEvent? event;
-    for (final e in response) {
+    for (final e in events) {
       if (e.date == lunarDate.ldd && e.month == lunarDate.lmm) {
         event = e;
         break;
@@ -132,13 +166,8 @@ class SolarLunarDate {
   }
 
   Future<Quotation> get quotation async {
-    final response = await fetchQuotations(
-      "https://airshipkirov52.github.io/lichhomnay-events/api/quotations.json",
-    );
-    if (response.isEmpty) {
-      throw Exception("No quotation data");
-    }
-    return response[jdn % response.length];
+    final quotations = await JsonCacheService.fetchQuotations();
+    return quotations[jdn % quotations.length];
   }
 }
 
