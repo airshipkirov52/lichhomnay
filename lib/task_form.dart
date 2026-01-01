@@ -88,32 +88,47 @@ class _TaskFormState extends State<TaskForm> {
     return Scaffold(
       body: SafeArea(
         child: Container(
-          margin: EdgeInsets.all(12),
+          padding: EdgeInsets.all(12),
           color: backgoundColor,
           child: Form(
             child: Column(
               children: [
-                const Text(
-                  "Thêm công việc trong ngày ewew",
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+                      style: IconButton.styleFrom(
+                        foregroundColor: Colors.black,
+                      ),
+                      icon: Icon(Icons.close),
+                    ),
+                    Spacer(),
+                    IconButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          Navigator.pop(context, _nameCtrl.text);
+                        }
+                      },
+                      style: IconButton.styleFrom(
+                        foregroundColor: Colors.black,
+                      ),
+                      icon: Icon(Icons.check),
+                    ),
+                  ],
+                ),
+                Text(
+                  "Thêm công việc trong ngày",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 TextFormField(
                   controller: _nameCtrl,
                   decoration: const InputDecoration(labelText: "Tên công việc"),
                   validator: (v) =>
                       v == null || v.isEmpty ? "Không được trống" : null,
                 ),
-                const SizedBox(height: 20),
-                const DateTimeField(),
-                ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      Navigator.pop(context, _nameCtrl.text);
-                    }
-                  },
-                  child: const Text("Lưu"),
-                ),
+                SizedBox(height: 20),
+                DateTimeField(),
               ],
             ),
           ),

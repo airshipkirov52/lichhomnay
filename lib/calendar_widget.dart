@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:lich_hom_nay/calendar_utils.dart';
 import 'package:lich_hom_nay/constants.dart';
 
-const backgoundColor = Color.fromARGB(255, 0, 255, 255);
+const backgoundColor = Color.fromARGB(255, 255, 255, 255);
 const foregroundColor = Color.fromARGB(255, 230, 240, 230);
 const selectedDateColor = Color.fromARGB(255, 250, 238, 0);
 const nonOfMonthColor = Color.fromARGB(255, 179, 179, 179);
@@ -202,8 +202,7 @@ class CalendarDateCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(3),
-      padding: EdgeInsets.all(2),
+      padding: EdgeInsets.all(3),
       decoration: BoxDecoration(
         color: buildCellColor(),
         borderRadius: BorderRadius.circular(5),

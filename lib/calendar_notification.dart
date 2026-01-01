@@ -97,12 +97,12 @@ class CalendarNotification {
   static Future<void> scheduleNotification({
     required String title,
     required String body,
-    required DateTime dt,
+    required DateTime scheduledDate,
   }) async {
     await regrantScheduleExactAlarms();
     final id = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     final details = NotificationDetails(android: androidDetails);
-    final tz.TZDateTime scheduledTZDate = tz.TZDateTime.from(dt, tz.local);
+    final tz.TZDateTime scheduledTZDate = tz.TZDateTime.from(scheduledDate, tz.local);
 
     await notificationsPlugin.zonedSchedule(
       id,

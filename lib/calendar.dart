@@ -45,11 +45,10 @@ class _CalendarState extends State<Calendar> {
     selectedDate = getSolarLunarDate(now);
     calendar = getCalendar(month, year);
     _controller = PageController(initialPage: initialPage);
-    _timer = Timer.periodic(const Duration(seconds: 15), (_) {});
     CalendarNotification.scheduleNotification(
       title: "Thông Báo",
       body: "Hello World",
-      dt: DateTime.now().add(Duration(minutes: 2)),
+      scheduledDate: DateTime.now().add(Duration(minutes: 60)),
     );
   }
 
@@ -140,7 +139,7 @@ class _CalendarState extends State<Calendar> {
       body: SafeArea(
         child: Container(
           color: backgoundColor,
-          margin: EdgeInsets.all(12),
+          padding: EdgeInsets.all(12),
           child: Column(
             children: [
               Container(
@@ -212,29 +211,34 @@ class _CalendarState extends State<Calendar> {
               ),
               SizedBox(
                 height: 330,
-                child: PageView.builder(
-                  controller: _controller,
-                  onPageChanged: onSwipMonth,
-                  itemBuilder: (context, index) => Column(
-                    children: [
-                      ...rows.map(
-                        (row) => Row(
-                          children: [
-                            for (final item in row)
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => onSelectDate(item),
-                                  child: CalendarDateCell(
-                                    currentMonth: month,
-                                    selectedDate: selectedDate,
-                                    solarLunarDate: item,
+                child: Padding(
+                  padding: EdgeInsetsGeometry.all(3),
+                  child: PageView.builder(
+                    controller: _controller,
+                    onPageChanged: onSwipMonth,
+                    itemBuilder: (context, index) => Column(
+                      spacing: 8,
+                      children: [
+                        ...rows.map(
+                          (row) => Row(
+                            spacing: 8,
+                            children: [
+                              for (final item in row)
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => onSelectDate(item),
+                                    child: CalendarDateCell(
+                                      currentMonth: month,
+                                      selectedDate: selectedDate,
+                                      solarLunarDate: item,
+                                    ),
                                   ),
                                 ),
-                              ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
