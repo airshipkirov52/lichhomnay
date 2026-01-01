@@ -83,11 +83,13 @@ class CircleSymbol extends StatelessWidget {
 
 class EventDateIcon extends StatelessWidget {
   final bool isOfMonth;
+  final bool isLunarLeapMonth;
   final Future<DateEvent?> solarDateEvent;
   final Future<DateEvent?> lunarDateEvent;
 
   const EventDateIcon({
     required this.isOfMonth,
+    required this.isLunarLeapMonth,
     required this.solarDateEvent,
     required this.lunarDateEvent,
     super.key,
@@ -101,8 +103,8 @@ class EventDateIcon extends StatelessWidget {
         if (!snapshot.hasData) {
           return const SizedBox.shrink();
         }
-        final hasEvent = snapshot.data!.any((e) => e != null);
-        if (!hasEvent) {
+        final hasEvent = snapshot.data!.any((e) => e != null && e.asterisk);
+        if (!hasEvent || isLunarLeapMonth) {
           return const SizedBox.shrink();
         }
 
@@ -159,7 +161,7 @@ class LunarDateText extends StatelessWidget {
     final text = StringBuffer()
       ..write(lunarDate.ldd)
       ..write(isFirstDay ? "/${lunarDate.lmm.toString()}" : "")
-      ..write(isFirstDay && lunarDate.leap == 1 ? "(N)" : "");
+      ..write(isFirstDay && lunarDate.leap == 1 ? "N" : "");
     return Text(text.toString(), style: style);
   }
 }
@@ -239,6 +241,7 @@ class CalendarDateCell extends StatelessWidget {
               solarDateEvent: solarLunarDate.solarDateEvent,
               lunarDateEvent: solarLunarDate.lunarDateEvent,
               isOfMonth: solarLunarDate.solarDate.month == currentMonth,
+              isLunarLeapMonth: solarLunarDate.lunarDate.leap == 1,
             ),
           ),
         ],
@@ -248,16 +251,17 @@ class CalendarDateCell extends StatelessWidget {
 }
 
 class EventText extends StatelessWidget {
+  final bool? isLunarLeapMonth;
   final Future<DateEvent?> dateEvent;
 
-  const EventText({required this.dateEvent, super.key});
+  const EventText({this.isLunarLeapMonth, required this.dateEvent, super.key});
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<DateEvent?>(
       future: dateEvent,
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
+        if (!snapshot.hasData || (isLunarLeapMonth != null && isLunarLeapMonth == true)) {
           return const SizedBox(height: 0);
         }
         return Container(
@@ -467,7 +471,10 @@ class SolarLunarDateDetail extends StatelessWidget {
             child: Column(
               children: [
                 EventText(dateEvent: solarLunarDate.solarDateEvent),
-                EventText(dateEvent: solarLunarDate.lunarDateEvent),
+                EventText(
+                  dateEvent: solarLunarDate.lunarDateEvent,
+                  isLunarLeapMonth: solarLunarDate.lunarDate.leap == 1,
+                ),
                 QuotationText(quotation: solarLunarDate.quotation),
               ],
             ),
@@ -506,7 +513,11 @@ class AuspiciousTimeRange extends StatelessWidget {
                   padding: EdgeInsets.all(3),
                   child: Column(
                     children: [
-                      Image.asset(item.earthlyBranch.img, width: 32, height: 32),
+                      Image.asset(
+                        item.earthlyBranch.img,
+                        width: 32,
+                        height: 32,
+                      ),
                       Text(
                         item.earthlyBranch.vi,
                         style: TextStyle(

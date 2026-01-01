@@ -210,7 +210,7 @@ class _CalendarState extends State<Calendar> {
                 ],
               ),
               SizedBox(
-                height: 330,
+                height: 340,
                 child: PageView.builder(
                   controller: _controller,
                   onPageChanged: onSwipMonth,
@@ -247,6 +247,41 @@ class _CalendarState extends State<Calendar> {
                 decoration: BoxDecoration(
                   color: foregroundColor,
                   borderRadius: BorderRadius.circular(5),
+                ),
+                child: Row(
+                  spacing: 10,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: [
+                        CircleSymbol(
+                          color: AuspiciousDayIcon.auspiciousColor,
+                          width: 5,
+                          height: 5,
+                        ),
+                        Text("Ngày Hoàng Đạo", style: TextStyle(fontSize: 10)),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        CircleSymbol(
+                          color: AuspiciousDayIcon.nonAuspiciousColor,
+                          width: 5,
+                          height: 5,
+                        ),
+                        Text("Ngày Hắc Đạo", style: TextStyle(fontSize: 10)),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(right: 6),
+                          child: AsteriskSymbol(color: yangColor),
+                        ),
+                        Text("Ngày có sự kiện", style: TextStyle(fontSize: 10)),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],
