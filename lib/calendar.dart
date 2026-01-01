@@ -211,34 +211,29 @@ class _CalendarState extends State<Calendar> {
               ),
               SizedBox(
                 height: 330,
-                child: Padding(
-                  padding: EdgeInsetsGeometry.all(3),
-                  child: PageView.builder(
-                    controller: _controller,
-                    onPageChanged: onSwipMonth,
-                    itemBuilder: (context, index) => Column(
-                      spacing: 8,
-                      children: [
-                        ...rows.map(
-                          (row) => Row(
-                            spacing: 8,
-                            children: [
-                              for (final item in row)
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () => onSelectDate(item),
-                                    child: CalendarDateCell(
-                                      currentMonth: month,
-                                      selectedDate: selectedDate,
-                                      solarLunarDate: item,
-                                    ),
+                child: PageView.builder(
+                  controller: _controller,
+                  onPageChanged: onSwipMonth,
+                  itemBuilder: (context, index) => Column(
+                    children: [
+                      ...rows.map(
+                        (row) => Row(
+                          children: [
+                            for (final item in row)
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => onSelectDate(item),
+                                  child: CalendarDateCell(
+                                    currentMonth: month,
+                                    selectedDate: selectedDate,
+                                    solarLunarDate: item,
                                   ),
                                 ),
-                            ],
-                          ),
+                              ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),

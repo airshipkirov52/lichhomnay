@@ -202,6 +202,7 @@ class CalendarDateCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: EdgeInsets.all(3),
       padding: EdgeInsets.all(3),
       decoration: BoxDecoration(
         color: buildCellColor(),
