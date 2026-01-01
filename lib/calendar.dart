@@ -1,7 +1,11 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:lich_hom_nay/calendar_notification.dart';
+import 'package:lich_hom_nay/calendar_widget.dart';
 import 'package:lich_hom_nay/calendar_utils.dart';
+import 'package:lich_hom_nay/task_form.dart';
 
 class Calendar extends StatefulWidget {
   const Calendar({super.key});
@@ -12,124 +16,25 @@ class Calendar extends StatefulWidget {
   }
 }
 
-class EventText extends StatelessWidget {
-  final Future<DateEvent?> dateEvent;
-
-  const EventText({required this.dateEvent, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<DateEvent?>(
-      future: dateEvent,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const SizedBox(height: 0);
-        }
-        return Container(
-          margin: EdgeInsets.only(top: 3),
-          child: Text(
-            snapshot.data!.events[0].name,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontWeight: FontWeight.w900,
-              fontSize: 12,
-              color: Color.fromARGB(255, 230, 0, 0),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class QuotationText extends StatelessWidget {
-  final Future<Quotation> quotation;
-
-  const QuotationText({required this.quotation, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<Quotation>(
-      future: quotation,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const SizedBox(height: 16);
-        }
-        return Container(
-          margin: EdgeInsets.only(top: 3),
-          child: Column(
-            children: [
-              Text(
-                snapshot.data!.content,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 10),
-              ),
-              Text(
-                snapshot.data!.author,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 10, fontStyle: FontStyle.italic),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
-class HasEventIcon extends StatelessWidget {
-  final bool isOfMonth;
-  final Future<DateEvent?> solarDateEvent;
-  final Future<DateEvent?> lunarDateEvent;
-
-  const HasEventIcon({
-    required this.isOfMonth,
-    required this.solarDateEvent,
-    required this.lunarDateEvent,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<List<DateEvent?>>(
-      future: Future.wait([solarDateEvent, lunarDateEvent]),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const SizedBox.shrink();
-        }
-        final hasEvent = snapshot.data!.any((e) => e != null);
-        if (!hasEvent) {
-          return const SizedBox.shrink();
-        }
-
-        return Positioned(
-          top: 1,
-          right: 1,
-          child: Text(
-            "*",
-            style: TextStyle(
-              color: isOfMonth
-                  ? const Color.fromARGB(255, 179, 179, 179)
-                  : const Color.fromARGB(255, 230, 0, 0),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
 class _CalendarState extends State<Calendar> {
-  final List<String> heading = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
-  late SolarLunarDate selectedDate;
+  static const int initialPage = 1000;
+  static const List<String> heading = [
+    "T2",
+    "T3",
+    "T4",
+    "T5",
+    "T6",
+    "T7",
+    "CN",
+  ];
+  int _currentPage = initialPage;
   late List<SolarLunarDate> calendar;
+  late SolarLunarDate selectedDate;
+
   late int month;
   late int year;
-  final backgound = Color.fromARGB(255, 255, 255, 255);
-  final foreground = Color.fromARGB(255, 230, 230, 230);
-  final auspiciousColor = Color.fromARGB(255, 20, 192, 60);
-  final nonAuspiciousColor = Color.fromARGB(255, 120, 120, 120);
+  late final PageController _controller;
+  late Timer _timer;
 
   @override
   void initState() {
@@ -139,6 +44,19 @@ class _CalendarState extends State<Calendar> {
     year = now.year;
     selectedDate = getSolarLunarDate(now);
     calendar = getCalendar(month, year);
+    _controller = PageController(initialPage: initialPage);
+    _timer = Timer.periodic(const Duration(seconds: 15), (_) {});
+    CalendarNotification.scheduleNotification(
+      title: "Thông Báo",
+      body: "Hello World",
+      dt: DateTime.now().add(Duration(minutes: 2)),
+    );
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
   }
 
   void onMoveNowDate() {
@@ -188,71 +106,28 @@ class _CalendarState extends State<Calendar> {
     });
   }
 
+  void onSwipMonth(int page) {
+    if (page > _currentPage) {
+      onNextMonth();
+    } else if (page < _currentPage) {
+      onPrevMonth();
+    }
+    _currentPage = page;
+  }
+
   void onSelectDate(SolarLunarDate solarLunarDate) {
     setState(() {
       selectedDate = solarLunarDate;
     });
   }
 
-  Color buildBackgroundCell(SolarLunarDate cell) {
-    if (selectedDate.solarDate.day == cell.solarDate.day &&
-        selectedDate.solarDate.month == cell.solarDate.month &&
-        selectedDate.solarDate.year == cell.solarDate.year) {
-      return const Color.fromARGB(255, 250, 238, 0);
-    }
-    return foreground;
-  }
-
-  TextStyle buildForegroundCell(SolarLunarDate cell) {
-    Color color = Colors.black;
-    if (cell.solarDate.weekday == 6) {
-      color = const Color.fromARGB(255, 20, 20, 230);
-    }
-    if (cell.solarDate.weekday == 7) {
-      color = const Color.fromARGB(255, 230, 0, 0);
-    }
-    if (cell.solarDate.month != month) {
-      color = const Color.fromARGB(255, 179, 179, 179);
-    }
-    return TextStyle(fontWeight: FontWeight.bold, color: color);
-  }
-
-  Widget buildAuspiciousDay(SolarLunarDate cell) {
-    if (cell.solarDate.month != month) {
-      return const SizedBox.shrink();
-    }
-    return Positioned(
-      top: 3,
-      left: 2,
-      child: Container(
-        width: 6,
-        height: 6,
-        decoration: BoxDecoration(
-          color: cell.lunarDate.isAuspicious
-              ? auspiciousColor
-              : nonAuspiciousColor,
-          borderRadius: BorderRadius.circular(5),
-        ),
-      ),
+  void onCreateEvent(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return const TaskForm();
+      },
     );
-  }
-
-  Text buildTextSolarDate(SolarLunarDate solarLunarDate) {
-    TextStyle style = buildForegroundCell(
-      solarLunarDate,
-    ).copyWith(fontSize: 16);
-    return Text(solarLunarDate.solarDate.day.toString(), style: style);
-  }
-
-  Text buildTextLunarDate(SolarLunarDate solarLunarDate) {
-    TextStyle style = buildForegroundCell(
-      solarLunarDate,
-    ).copyWith(fontSize: 12);
-    LunarDate lunarDate = solarLunarDate.lunarDate;
-    String ldd = lunarDate.ldd.toString();
-    String lmm = lunarDate.ldd == 1 ? "/${lunarDate.lmm.toString()}" : "";
-    String leap = lunarDate.ldd == 1 && lunarDate.leap == 1 ? "(N)" : "";
-    return Text("$ldd$lmm$leap", style: style);
   }
 
   @override
@@ -264,14 +139,14 @@ class _CalendarState extends State<Calendar> {
     return Scaffold(
       body: SafeArea(
         child: Container(
-          color: backgound,
+          color: backgoundColor,
           margin: EdgeInsets.all(12),
           child: Column(
             children: [
               Container(
                 margin: EdgeInsets.all(3),
                 decoration: BoxDecoration(
-                  color: foreground,
+                  color: foregroundColor,
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: Row(
@@ -284,33 +159,21 @@ class _CalendarState extends State<Calendar> {
                       ),
                       icon: Icon(Icons.keyboard_double_arrow_left),
                     ),
-                    IconButton(
-                      onPressed: onPrevMonth,
-                      style: IconButton.styleFrom(
-                        foregroundColor: Colors.black,
-                      ),
-                      icon: Icon(Icons.keyboard_arrow_left),
-                    ),
-                    TextButton(
-                      onPressed: onMoveNowDate,
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.black,
-                      ),
-                      child: Text(
-                        "Tháng $month - $year",
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
+                    Expanded(
+                      child: TextButton(
+                        onPressed: onMoveNowDate,
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.black,
+                        ),
+                        child: Text(
+                          "Tháng $month - $year",
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
                         ),
                       ),
-                    ),
-                    IconButton(
-                      onPressed: onNextMonth,
-                      style: IconButton.styleFrom(
-                        foregroundColor: Colors.black,
-                      ),
-                      icon: Icon(Icons.keyboard_arrow_right),
                     ),
                     IconButton(
                       onPressed: onNextYear,
@@ -318,6 +181,13 @@ class _CalendarState extends State<Calendar> {
                         foregroundColor: Colors.black,
                       ),
                       icon: Icon(Icons.keyboard_double_arrow_right),
+                    ),
+                    IconButton(
+                      onPressed: () => onCreateEvent(context),
+                      style: IconButton.styleFrom(
+                        foregroundColor: Colors.black,
+                      ),
+                      icon: Icon(Icons.assignment_add),
                     ),
                   ],
                 ),
@@ -340,257 +210,44 @@ class _CalendarState extends State<Calendar> {
                     ),
                 ],
               ),
-              ...rows.map(
-                (row) => Row(
-                  children: [
-                    for (final item in row)
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => onSelectDate(item),
-                          child: Container(
-                            margin: EdgeInsets.all(3),
-                            padding: EdgeInsets.all(2),
-                            decoration: BoxDecoration(
-                              color: buildBackgroundCell(item),
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            child: SizedBox(
-                              child: Stack(
-                                alignment: AlignmentGeometry.center,
-                                children: [
-                                  Column(
-                                    children: [
-                                      buildTextSolarDate(item),
-                                      buildTextLunarDate(item),
-                                    ],
+              SizedBox(
+                height: 330,
+                child: PageView.builder(
+                  controller: _controller,
+                  onPageChanged: onSwipMonth,
+                  itemBuilder: (context, index) => Column(
+                    children: [
+                      ...rows.map(
+                        (row) => Row(
+                          children: [
+                            for (final item in row)
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => onSelectDate(item),
+                                  child: CalendarDateCell(
+                                    currentMonth: month,
+                                    selectedDate: selectedDate,
+                                    solarLunarDate: item,
                                   ),
-                                  buildAuspiciousDay(item),
-                                  HasEventIcon(
-                                    isOfMonth: item.solarDate.month != month,
-                                    solarDateEvent: item.solarDateEvent,
-                                    lunarDateEvent: item.lunarDateEvent,
-                                  ),
-                                ],
+                                ),
                               ),
-                            ),
-                          ),
+                          ],
                         ),
                       ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-              Container(
-                margin: EdgeInsets.only(top: 6, right: 2, bottom: 6, left: 3),
-                padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: foreground,
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          flex: 6,
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    "${selectedDate.dayOfWeekLocalize.vi}, ",
-                                    style: TextStyle(
-                                      color: Color.fromARGB(255, 230, 0, 0),
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                  Text(
-                                    "${selectedDate.solarDate.day.toString()} Th ${selectedDate.solarDate.month}, ",
-                                    style: TextStyle(
-                                      color: Color.fromARGB(255, 230, 0, 0),
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                  Text(
-                                    selectedDate.solarDate.year.toString(),
-                                    style: TextStyle(
-                                      color: Color.fromARGB(255, 230, 0, 0),
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "${selectedDate.lunarDate.ldd} ",
-                                    style: TextStyle(
-                                      color: Color.fromARGB(255, 0, 0, 230),
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                  Text(
-                                    "Th ${selectedDate.lunarDate.lmm}, ",
-                                    style: TextStyle(
-                                      color: Color.fromARGB(255, 0, 0, 230),
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                  Text(
-                                    "Năm ${selectedDate.lunarDate.yearHeavenlyStem.vi} ${selectedDate.lunarDate.yearEarthlyBranch.vi}",
-                                    style: TextStyle(
-                                      color: Color.fromARGB(255, 0, 0, 230),
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 8,
-                                    height: 8,
-                                    margin: EdgeInsets.only(right: 8),
-                                    decoration: BoxDecoration(
-                                      color: selectedDate.lunarDate.isAuspicious
-                                          ? auspiciousColor
-                                          : nonAuspiciousColor,
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                  ),
-                                  selectedDate.lunarDate.isAuspicious
-                                      ? Text(
-                                          "Ngày Hoàng Đạo",
-                                          style: TextStyle(
-                                            color: Color.fromARGB(
-                                              255,
-                                              230,
-                                              0,
-                                              0,
-                                            ),
-                                            fontWeight: FontWeight.w900,
-                                            fontSize: 13,
-                                          ),
-                                        )
-                                      : Text(
-                                          "Ngày Hắc Đạo",
-                                          style: TextStyle(
-                                            color: Color.fromARGB(255, 0, 0, 0),
-                                            fontWeight: FontWeight.w900,
-                                            fontSize: 13,
-                                          ),
-                                        ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Flexible(
-                          flex: 4,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Container(
-                                alignment: AlignmentGeometry.topLeft,
-                                padding: EdgeInsets.only(left: 12),
-                                child: Text(
-                                  "Giờ ${selectedDate.lunarDate.tyHourStem.vi} Tý",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                alignment: AlignmentGeometry.topLeft,
-                                padding: EdgeInsets.only(left: 12),
-                                child: Text(
-                                  "Ngày ${selectedDate.lunarDate.dayHeavenlyStem.vi} ${selectedDate.lunarDate.dayEarthlyBranch.vi} ",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                alignment: AlignmentGeometry.topLeft,
-                                padding: EdgeInsets.only(left: 12),
-                                child: Text(
-                                  "Tháng ${selectedDate.lunarDate.monthHeavenlyStem.vi} ${selectedDate.lunarDate.monthEarthlyBranch.vi}",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 8),
-                      child: Column(
-                        children: [
-                          EventText(dateEvent: selectedDate.solarDateEvent),
-                          EventText(dateEvent: selectedDate.lunarDateEvent),
-                          QuotationText(quotation: selectedDate.quotation),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+              SolarLunarDateDetail(solarLunarDate: selectedDate),
+              AuspiciousTimeRange(
+                auspiciousTimes: selectedDate.lunarDate.auspiciousTimes,
               ),
               Container(
-                margin: EdgeInsets.only(top: 6, right: 2, bottom: 6, left: 3),
+                margin: EdgeInsets.only(top: 6, right: 3, bottom: 6, left: 3),
                 padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: foreground,
+                  color: foregroundColor,
                   borderRadius: BorderRadius.circular(5),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      "Giờ hoàng đạo",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 13,
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        for (final item
-                            in selectedDate.lunarDate.auspiciousTimes)
-                          Container(
-                            margin: EdgeInsets.all(3),
-                            child: Column(
-                              children: [
-                                Text(
-                                  item.earthlyBranch,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                                Text(
-                                  item.timeRange,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 10,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                      ],
-                    ),
-                  ],
                 ),
               ),
             ],

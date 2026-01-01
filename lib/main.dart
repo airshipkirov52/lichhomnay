@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lich_hom_nay/calendar.dart';
+import 'package:lich_hom_nay/calendar_notification.dart';
 import 'package:lich_hom_nay/fetch.dart';
 import 'package:lich_hom_nay/json_cache_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await CalendarNotification.initialNotification();
   await fetchAndCache(
     "https://airshipkirov52.github.io/lichhomnay-events/api/solardate-events.json",
     JsonCacheService.solarEventsKey,

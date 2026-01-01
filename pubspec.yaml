@@ -38,6 +38,9 @@ dependencies:
   http: ^1.2.0
   shared_preferences: ^2.2.2
   rename: ^3.1.0
+  flutter_local_notifications: ^17.0.0
+  timezone: ^0.9.2
+  flutter_timezone: 5.0.1
 
 dev_dependencies:
   flutter_test:
@@ -55,15 +58,12 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-  assets:
-    - assets/solardate-events.json
-    - assets/lunardate-events.json
-    - assets/quotations.json
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-
+  assets:
+    - assets/12_con_giap/
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

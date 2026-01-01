@@ -21,24 +21,25 @@ enum HeavenlyStem {
 }
 
 enum EarthlyBranch {
-  ti(0, "Tý", "子"),
-  suu(1, "Sửu", "丑"),
-  dan(2, "Dần", "寅"),
-  mao(3, "Mão", "卯"),
-  thin(4, "Thìn", "辰"),
-  ty(5, "Tỵ", "巳"),
-  ngo(6, "Ngọ", "午"),
-  mui(7, "Mùi", "未"),
-  than(8, "Thân", "申"),
-  dau(9, "Dậu", "酉"),
-  tuat(10, "Tuất", "戌"),
-  hoi(11, "Hợi", "亥");
+  ti(0, "Tý", "子", "assets/12_con_giap/01_ti.png"),
+  suu(1, "Sửu", "丑", "assets/12_con_giap/02_suu.png"),
+  dan(2, "Dần", "寅", "assets/12_con_giap/03_dan.png"),
+  mao(3, "Mão", "卯", "assets/12_con_giap/04_mao.png"),
+  thin(4, "Thìn", "辰", "assets/12_con_giap/05_thin.png"),
+  ty(5, "Tỵ", "巳", "assets/12_con_giap/06_ty.png"),
+  ngo(6, "Ngọ", "午", "assets/12_con_giap/07_ngo.png"),
+  mui(7, "Mùi", "未", "assets/12_con_giap/08_mui.png"),
+  than(8, "Thân", "申", "assets/12_con_giap/09_than.png"),
+  dau(9, "Dậu", "酉", "assets/12_con_giap/10_dau.png"),
+  tuat(10, "Tuất", "戌", "assets/12_con_giap/11_tuat.png"),
+  hoi(11, "Hợi", "亥", "assets/12_con_giap/12_hoi.png");
 
   final int value;
   final String vi;
   final String zh;
+  final String img;
 
-  const EarthlyBranch(this.value, this.vi, this.zh);
+  const EarthlyBranch(this.value, this.vi, this.zh, this.img);
 
   static EarthlyBranch from(int value) =>
       EarthlyBranch.values.firstWhere((e) => e.value == value);
@@ -149,21 +150,21 @@ enum SolarTermLocalize {
 }
 
 enum LunarTimes {
-  ti(0, "Tý", "23h-01h"),
-  suu(1, "Sửu", "01h-03h"),
-  dan(2, "Dần", "03h-05h"),
-  mao(3, "Mão", "05h-07h"),
-  thin(4, "Thìn", "07h-09h"),
-  ty(5, "Tỵ", "09h-11h"),
-  ngo(6, "Ngọ", "11h-13h"),
-  mui(7, "Mùi", "13h-15h"),
-  than(8, "Thân", "15h-17h"),
-  dau(9, "Dậu", "17h-19h"),
-  tuat(10, "Tuất", "19h-21h"),
-  hoi(11, "Hợi", "21h-23h");
+  ti(0, EarthlyBranch.ti, "23h-01h"),
+  suu(1, EarthlyBranch.suu, "01h-03h"),
+  dan(2, EarthlyBranch.dan, "03h-05h"),
+  mao(3, EarthlyBranch.mao, "05h-07h"),
+  thin(4, EarthlyBranch.thin, "07h-09h"),
+  ty(5, EarthlyBranch.ty, "09h-11h"),
+  ngo(6, EarthlyBranch.ngo, "11h-13h"),
+  mui(7, EarthlyBranch.mui, "13h-15h"),
+  than(8, EarthlyBranch.than, "15h-17h"),
+  dau(9, EarthlyBranch.dau, "17h-19h"),
+  tuat(10, EarthlyBranch.tuat, "19h-21h"),
+  hoi(11, EarthlyBranch.hoi, "21h-23h");
 
   final int value;
-  final String earthlyBranch;
+  final EarthlyBranch earthlyBranch;
   final String timeRange;
 
   const LunarTimes(this.value, this.earthlyBranch, this.timeRange);

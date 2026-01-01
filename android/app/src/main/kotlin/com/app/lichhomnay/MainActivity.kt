@@ -1,4 +1,4 @@
-package com.example.lich_hom_nay
+package com.app.lichhomnay
 
 import io.flutter.embedding.android.FlutterActivity
 
