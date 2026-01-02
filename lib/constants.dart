@@ -1,3 +1,12 @@
+import 'package:flutter/material.dart';
+
+const backgoundColor = Color.fromARGB(255, 255, 255, 255);
+const foregroundColor = Color.fromARGB(255, 230, 240, 230);
+const selectedDateColor = Color.fromARGB(255, 250, 238, 0);
+const nonOfMonthColor = Color.fromARGB(255, 179, 179, 179);
+const yinColor = Color.fromARGB(255, 20, 20, 230);
+const yangColor = Color.fromARGB(255, 230, 0, 0);
+
 enum HeavenlyStem {
   giap(0, "Giáp", "甲"),
   at(1, "Ất", "乙"),

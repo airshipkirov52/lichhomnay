@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:lich_hom_nay/calendar_widget.dart';
+import 'package:lich_hom_nay/constants.dart';
+import 'package:lich_hom_nay/datetime_select.dart';
 
 class DateTimeField extends StatefulWidget {
   const DateTimeField({super.key});
@@ -96,7 +98,8 @@ class _TaskFormState extends State<TaskForm> {
                 Row(
                   children: [
                     IconButton(
-                      onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+                      onPressed: () =>
+                          Navigator.of(context, rootNavigator: true).pop(),
                       style: IconButton.styleFrom(
                         foregroundColor: Colors.black,
                       ),
@@ -129,6 +132,7 @@ class _TaskFormState extends State<TaskForm> {
                 ),
                 SizedBox(height: 20),
                 DateTimeField(),
+                DatetimeSelect(),
               ],
             ),
           ),
